@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoundMark- Avalie suas musicas favoritas</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>SoundMark</h1>
+    <p>Crie sua conta ou faça login para avaliar suas músicas favoritas e novidades</p>
+  </header>
+
+  <main class="layout">
+    <button> Cadastrar</button>
+    <button> Login</button>
+
+    <dialog id="cadastroDialog">
+
+      <form method="dialog">
+        <h2>Cadastro</h2>
+        <label for="usuario">Nome de usuário:</label>
+        <input type="text" id="username" name="username" required />
+        <label for="Senha">Senha:</label>
+        <input type="password" id="password" name="password" required />
+        <button type="Registrar">Registrar</button>
+      </form>
+    
+    </dialog>
+
+    <dialog id="loginDialog">
+
+      <form method="dialog">
+
+        <h2>Login</h2>
+        <label for="usuario">Nome de usuário:</label>
+        <input type="text" id="username" name="username" required />
+        <label for="Senha">Senha:</label>
+        <input type="password" id="password" name="password" required />
+        <button type="Login">Login</button>
+        
+      </form>
+
+  </main>
+
+  <footer class="site-footer">
+    <small>Disciplina de desenvolvimento web com containers</small>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
