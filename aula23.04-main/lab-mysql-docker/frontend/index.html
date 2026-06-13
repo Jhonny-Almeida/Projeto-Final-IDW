@@ -12,18 +12,20 @@
     <p>Crie sua conta ou faça login para avaliar suas músicas favoritas e novidades</p>
   </header>
 
-  <main class="layout">
-    <button> Cadastrar</button>
-    <button> Login</button>
+  <main class="body">
+    <button id="cadastrarBtn"> Cadastrar</button>
+    <button id="loginBtn"> Login</button>
 
     <dialog id="cadastroDialog">
 
       <form method="dialog">
         <h2>Cadastro</h2>
         <label for="usuario">Nome de usuário:</label>
-        <input type="text" id="username" name="username" required />
+        <input type="text" id="usuario" name="usuario" required />
         <label for="Senha">Senha:</label>
-        <input type="password" id="password" name="password" required />
+        <input type="senha" id="senha" name="senha" required />
+        <label for="Confirmar Senha">Confirmar Senha:</label>
+        <input type="senha" id="confirmarSenha" name="confirmarSenha" required />
         <button type="Registrar">Registrar</button>
       </form>
     
@@ -35,17 +37,30 @@
 
         <h2>Login</h2>
         <label for="usuario">Nome de usuário:</label>
-        <input type="text" id="username" name="username" required />
+        <input type="text" id="usuario" name="usuario" required />
         <label for="Senha">Senha:</label>
-        <input type="password" id="password" name="password" required />
+        <input type="senha" id="senha" name="senha" required />
         <button type="Login">Login</button>
         
       </form>
 
+    </dialog>
+
+    <div class="Carrossel">
+
+      <div class="Album" id="Album">
+
+        <!-- Add cards com ligação a api do last.fm para mostrar os albuns mais populares -->
+
+
+      </div>
+
+    </div>
+
   </main>
 
   <footer class="site-footer">
-    <small>Disciplina de desenvolvimento web com containers</small>
+    <small>SoundMark - Dados musicais via Last.fm</small>
   </footer>
 
   <script src="./app.js"></script>

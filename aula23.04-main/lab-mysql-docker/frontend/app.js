@@ -1,22 +1,25 @@
 const form = document.getElementById('usuario-form');
-const idInput = document.getElementById('usuario-id');
 const nomeInput = document.getElementById('nome');
-const emailInput = document.getElementById('email');
-const tabela = document.getElementById('usuarios-tabela');
-const mensagem = document.getElementById('mensagem');
-const cancelarEdicaoBtn = document.getElementById('cancelar-edicao');
+const SenhaInput = document.getElementById('senha');
+const cadastrarBtnInput = document.getElementById('cadastrarBtn');
+const loginBtnInput = document.getElementById('loginBtn');
+const cadastrarModal = document.getElementById('cadastroDialog');
+const loginModal = document.getElementById('loginDialog');
 
-const API_URL = '/usuarios';
-const STORAGE_KEY = 'usuarioDraft';
+cadastrarBtnInput.onclick = () => {
+  cadastrarModal.showModal();
+}
+
+loginBtnInput.onclick = () => {
+  loginModal.showModal();
+}
+
 
 function mostrarMensagem(texto, erro = false) {
   mensagem.textContent = texto;
   mensagem.style.color = erro ? '#b42318' : '#0b5b55';
 }
 
-function salvarDadosLocalmente(dados) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-}
 
 function carregarDadosSalvos() {
   const dados = localStorage.getItem(STORAGE_KEY);
@@ -28,9 +31,9 @@ function carregarDadosSalvos() {
   try {
     const usuario = JSON.parse(dados);
 
-    idInput.value = usuario.id || '';
     nomeInput.value = usuario.nome || '';
-    emailInput.value = usuario.email || '';
+
+    
 
     mostrarMensagem('Dados carregados do navegador. Clique em Salvar para persistir.');
   } catch (error) {
@@ -42,12 +45,6 @@ function limparDadosLocais() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function limparFormulario() {
-  idInput.value = '';
-  nomeInput.value = '';
-  emailInput.value = '';
-  limparDadosLocais();
-}
 
 async function carregarUsuarios() {
   try {
@@ -59,9 +56,8 @@ async function carregarUsuarios() {
     usuarios.forEach((usuario) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${usuario.id}</td>
         <td>${usuario.nome}</td>
-        <td>${usuario.email}</td>
+        <td>${usuario.senha}</td>
         <td>
           <button class="acao" data-editar="${usuario.id}">Editar</button>
           <button class="acao btn-excluir" data-excluir="${usuario.id}">Excluir</button>
@@ -82,11 +78,11 @@ async function salvarUsuario(event) {
   const payload = {
     id,
     nome: nomeInput.value.trim(),
-    email: emailInput.value.trim()
+    senha: SenhaInput.value.trim()
   };
 
-  if (!payload.nome || !payload.email) {
-    mostrarMensagem('Nome e email são obrigatórios.', true);
+  if (!payload.nome || !payload.senha) {
+    mostrarMensagem('Nome e senha são obrigatórios.', true);
     return;
   }
 
