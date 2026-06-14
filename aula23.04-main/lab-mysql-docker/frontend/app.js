@@ -5,6 +5,7 @@ const cadastrarBtnInput = document.getElementById('cadastrarBtn');
 const loginBtnInput = document.getElementById('loginBtn');
 const cadastrarModal = document.getElementById('cadastroDialog');
 const loginModal = document.getElementById('loginDialog');
+const carrosseis = document.querySelectorAll('.carrossel');
 
 cadastrarBtnInput.onclick = () => {
   cadastrarModal.showModal();
@@ -14,10 +15,31 @@ loginBtnInput.onclick = () => {
   loginModal.showModal();
 }
 
+//verificar se o usuário prefere reduzir animações e, se não, adicionar a classe de animação
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  addAnimation();
+}
 
-function mostrarMensagem(texto, erro = false) {
-  mensagem.textContent = texto;
-  mensagem.style.color = erro ? '#b42318' : '#0b5b55';
+function addAnimation() {
+
+  carrosseis.forEach(carrossel => {
+    carrossel.setAttribute('data-animate', 'true');
+
+    const grupoAlbuns = carrossel.querySelector('.grupo-albuns');
+    const albuns = Array.from(grupoAlbuns.children);
+    const larguraOriginal = grupoAlbuns.scrollWidth;
+    const estiloGrupo = window.getComputedStyle(grupoAlbuns);
+    const gap = parseFloat(estiloGrupo.columnGap || estiloGrupo.gap || '0');
+
+    albuns.forEach((item) => {
+      const itemDuplicado = item.cloneNode(true);
+      itemDuplicado.setAttribute('aria-hidden', 'true');
+      grupoAlbuns.appendChild(itemDuplicado);
+    });
+    carrossel.style.setProperty('--carrossel-distance', `${larguraOriginal + gap}px`);
+    carrossel.style.setProperty('--carrossel-duration', '40s');
+  });
+
 }
 
 
