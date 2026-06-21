@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<link href="https://fonts.googleapis.com/css2?family=Puritan:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SoundMark- Avalie suas musicas favoritas</title>
+  <title>SoundMark</title>
   <link rel="stylesheet" href="./style.css" />
+  <script type="text/javascript" src="app.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <h1>SoundMark</h1>
-    <p>Crie sua conta ou faça login para avaliar suas músicas favoritas e novidades</p>
-  </header>
-
-  <main class="body">
+    
+    <div class="buttons">
     <button id="cadastrarBtn"> Cadastrar</button>
     <button id="loginBtn"> Login</button>
+    </div>  
+  </header>
 
+  <main class="site-main">
+    <p>Crie sua conta ou faça login para avaliar suas músicas favoritas e novidades</p>
     <dialog id="cadastroDialog">
-
+      
       <form method="dialog">
         <h2>Cadastro</h2>
         <label for="usuario">Nome de usuário:</label>
@@ -53,20 +58,15 @@
         <div class="album">girl</div>
         <div class="album">keep</div>
         <div class="album">buping</div>
-        <div class="album">that</div>
-        
+        <div class="album">that</div>        
       </div>
-      
-      
-      
-      
+   
     </div>
-
 
   </main>
 
   <footer class="site-footer">
-    <small>SoundMark - Dados musicais via Last.fm</small>
+    <small>SoundMark - Dados musicais via <a href="https://www.last.fm" target="_blank" rel="noopener noreferrer">Last.fm</a></small>
   </footer>
 
   <script src="./app.js"></script>

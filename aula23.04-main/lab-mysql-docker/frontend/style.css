@@ -1,3 +1,96 @@
+html {
+    font-family:Puritan; 
+}
+
+body{
+    margin: 0;
+    background: #fefae0;
+    
+}
+
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    background: #67743d;
+    color: white;
+}
+
+footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    background: #67743d;
+    color: white;
+    font-family: Puritan extra-bold;
+}
+
+button{
+    padding: .5em 1em;
+    border: none;
+    border-radius: .2em;
+    background: #fefae0;
+    color: #67743d;
+    font-weight: bold;
+    cursor: pointer;   
+    
+}
+
+button:hover{
+    background: #d8d5bf;
+}
+
+main p {
+    text-align: center;
+    font-size: 2em;
+    margin: 2em 0;
+    color: #67743d;
+}
+
+/* Estilos para os dialogs */
+dialog {
+    padding: 2em;
+    border-radius: 0.5em;
+    border: none;
+    width: 400px;
+    background: #67743d;
+    text-align: center;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+dialog h2 {
+    color: #fefae0;
+    margin-top: 0;
+}
+
+dialog label {
+    color: #fefae0;;
+    font-weight: bold;
+}
+
+dialog input {
+    padding: 0.5em;
+    border: 1px solid #fefae0;;
+    border-radius: 0.2em;
+}
+
+dialog button {
+    margin: 1em auto 0;
+    padding: 0.7em;
+    width: 50%;
+}
+
 .carrossel {
     margin: 100px auto;
     max-width: 1450px;
@@ -25,7 +118,6 @@
 }
 
 .carrossel[data-animate="true"]{
-    border: 5px solid red;
     overflow: hidden;
     -webkit-mask: linear-gradient(90deg,transparent, white 20%, white 80%, transparent); /*para o cromium*/
     mask: linear-gradient(90deg,transparent, white 20%, white 80%, transparent);

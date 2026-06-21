@@ -37,7 +37,7 @@ function addAnimation() {
       grupoAlbuns.appendChild(itemDuplicado);
     });
     carrossel.style.setProperty('--carrossel-distance', `${larguraOriginal + gap}px`);
-    carrossel.style.setProperty('--carrossel-duration', '40s');
+    carrossel.style.setProperty('--carrossel-duration', '60s');
   });
 
 }
