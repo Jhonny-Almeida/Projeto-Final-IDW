@@ -105,16 +105,96 @@ dialog button {
     gap: 1em; 
 }
 
-.album {
-    flex: 0 0 5em;
-    height: 5em;
-    padding: 1em;
-    background: lime;
-    font-size: 3rem;
-    border-radius: .2em;
-    text-align: center;
-    align-content: center;
 
+
+.carrossel-titulo {
+    text-align: center;
+    color: #67743d;
+    margin-top: 2em;
+}
+
+/* Cards de música do Last.fm */
+.musica-card {
+    flex: 0 0 14em;
+    height: 14em;
+    background: #d8d5bf;
+    padding: 0;
+    border-radius: .6em;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    position: relative;
+}
+
+.musica-card .capa-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.musica-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.musica-card .posicao {
+    position: absolute;
+    top: .5em;
+    left: .5em;
+    background: #67743d;
+    color: #fefae0;
+    font-weight: bold;
+    font-size: .8rem;
+    padding: .2em .6em;
+    border-radius: 1em;
+    z-index: 2;
+}
+
+.musica-card .musica-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(2px);
+    padding: .5em .7em .6em;
+    z-index: 2;
+}
+
+.musica-card .musica-nome {
+    font-weight: bold;
+    color: #67743d;
+    font-size: .9rem;
+    margin: 0 0 .15em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.musica-card .musica-artista {
+    font-size: .78rem;
+    color: #444;
+    margin: 0 0 .15em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.musica-card .musica-plays {
+    font-size: .72rem;
+    color: #777;
+    margin: 0;
+}
+
+.album-loading,
+.album-erro {
+    flex: 0 0 100%;
+    background: transparent;
+    color: #67743d;
+    font-size: 1.2rem;
 }
 
 .carrossel[data-animate="true"]{
