@@ -1,23 +1,37 @@
-const form = document.getElementById('usuario-form');
-const nomeInput = document.getElementById('nome');
-const SenhaInput = document.getElementById('senha');
 const cadastrarBtnInput = document.getElementById('cadastrarBtn');
 const loginBtnInput = document.getElementById('loginBtn');
 const cadastrarModal = document.getElementById('cadastroDialog');
 const loginModal = document.getElementById('loginDialog');
 const carrosseis = document.querySelectorAll('.carrossel');
 
+const cadastroForm = document.getElementById('cadastroForm');
+const loginForm = document.getElementById('loginForm');
+const cadastroErro = document.getElementById('cadastroErro');
+const loginErro = document.getElementById('loginErro');
+const botoesVisitante = document.getElementById('botoesVisitante');
+const areaLogado = document.getElementById('areaLogado');
+const nomeUsuarioLogado = document.getElementById('nomeUsuarioLogado');
+const logoutBtn = document.getElementById('logoutBtn');
+
 // --- Configuração da API do Last.fm ---
 const LASTFM_API_KEY = 'f5a143c4b5fefd5d6776ce666e553c11';
 const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
 cadastrarBtnInput.onclick = () => {
+  cadastroErro.textContent = '';
   cadastrarModal.showModal();
 }
 
 loginBtnInput.onclick = () => {
+  loginErro.textContent = '';
   loginModal.showModal();
 }
+
+document.querySelectorAll('.fechar-modal').forEach((botao) => {
+  botao.addEventListener('click', () => {
+    document.getElementById(botao.dataset.modal).close();
+  });
+});
 
 //verificar se o usuário prefere reduzir animações
 const reduzirAnimacao = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -241,3 +255,116 @@ async function buscarFotoArtistaNaItunes(nomeArtista) {
 
 carregarTopMusicas();
 
+// --- Autenticação (cadastro, login, logout, sessão) ---
+
+cadastroForm.addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  cadastroErro.textContent = '';
+
+  const usuario = document.getElementById('cadastro-usuario').value.trim();
+  const senha = document.getElementById('cadastro-senha').value;
+  const confirmarSenha = document.getElementById('cadastro-confirmar-senha').value;
+
+  if (senha !== confirmarSenha) {
+    cadastroErro.textContent = 'As senhas não coincidem';
+    return;
+  }
+
+  try {
+    const resposta = await fetch('/auth/cadastro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ nome: usuario, senha, confirmarSenha })
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      cadastroErro.textContent = dados.erro || 'Não foi possível concluir o cadastro';
+      return;
+    }
+
+    cadastroForm.reset();
+    cadastrarModal.close();
+    aplicarSessaoLogada(dados.usuario);
+  } catch (error) {
+    console.error('Erro ao cadastrar:', error);
+    cadastroErro.textContent = 'Erro de conexão com o servidor';
+  }
+});
+
+loginForm.addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  loginErro.textContent = '';
+
+  const usuario = document.getElementById('login-usuario').value.trim();
+  const senha = document.getElementById('login-senha').value;
+
+  try {
+    const resposta = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ nome: usuario, senha })
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      loginErro.textContent = dados.erro || 'Não foi possível fazer login';
+      return;
+    }
+
+    loginForm.reset();
+    loginModal.close();
+    aplicarSessaoLogada(dados.usuario);
+  } catch (error) {
+    console.error('Erro ao fazer login:', error);
+    loginErro.textContent = 'Erro de conexão com o servidor';
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  try {
+    await fetch('/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (error) {
+    console.error('Erro ao fazer logout:', error);
+  } finally {
+    aplicarSessaoDeslogada();
+  }
+});
+
+function aplicarSessaoLogada(usuario) {
+  nomeUsuarioLogado.textContent = `Olá, ${usuario.nome}`;
+  botoesVisitante.hidden = true;
+  areaLogado.hidden = false;
+}
+
+function aplicarSessaoDeslogada() {
+  botoesVisitante.hidden = false;
+  areaLogado.hidden = true;
+}
+
+// ao carregar a página, verifica se já existe uma sessão ativa no backend
+async function verificarSessaoAtual() {
+  try {
+    const resposta = await fetch('/auth/me', { credentials: 'include' });
+
+    if (!resposta.ok) {
+      aplicarSessaoDeslogada();
+      return;
+    }
+
+    const dados = await resposta.json();
+    aplicarSessaoLogada(dados.usuario);
+  } catch (error) {
+    console.warn('Não foi possível verificar a sessão atual', error);
+    aplicarSessaoDeslogada();
+  }
+}
+
+verificarSessaoAtual();

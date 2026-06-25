@@ -13,40 +13,49 @@
   <header class="site-header">
     <h1>SoundMark</h1>
     
-    <div class="buttons">
+    <div class="buttons" id="botoesVisitante">
     <button id="cadastrarBtn"> Cadastrar</button>
     <button id="loginBtn"> Login</button>
-    </div>  
+    </div>
+
+    <div class="buttons" id="areaLogado" hidden>
+    <span id="nomeUsuarioLogado"></span>
+    <button id="logoutBtn">Sair</button>
+    </div>
   </header>
 
   <main class="site-main">
     <p>Crie sua conta ou faça login para avaliar suas músicas favoritas e novidades</p>
     <dialog id="cadastroDialog">
-      
-      <form method="dialog">
+
+      <form id="cadastroForm">
         <h2>Cadastro</h2>
-        <label for="usuario">Nome de usuário:</label>
-        <input type="text" id="usuario" name="usuario" required />
-        <label for="Senha">Senha:</label>
-        <input type="senha" id="senha" name="senha" required />
-        <label for="Confirmar Senha">Confirmar Senha:</label>
-        <input type="senha" id="confirmarSenha" name="confirmarSenha" required />
-        <button type="Registrar">Registrar</button>
+        <label for="cadastro-usuario">Nome de usuário:</label>
+        <input type="text" id="cadastro-usuario" name="usuario" required minlength="3" />
+        <label for="cadastro-senha">Senha:</label>
+        <input type="password" id="cadastro-senha" name="senha" required minlength="6" />
+        <label for="cadastro-confirmar-senha">Confirmar Senha:</label>
+        <input type="password" id="cadastro-confirmar-senha" name="confirmarSenha" required minlength="6" />
+        <p class="form-erro" id="cadastroErro"></p>
+        <button type="submit">Registrar</button>
+        <button type="button" class="fechar-modal" data-modal="cadastroDialog">Cancelar</button>
       </form>
-    
+
     </dialog>
 
     <dialog id="loginDialog">
 
-      <form method="dialog">
+      <form id="loginForm">
 
         <h2>Login</h2>
-        <label for="usuario">Nome de usuário:</label>
-        <input type="text" id="usuario" name="usuario" required />
-        <label for="Senha">Senha:</label>
-        <input type="senha" id="senha" name="senha" required />
-        <button type="Login">Login</button>
-        
+        <label for="login-usuario">Nome de usuário:</label>
+        <input type="text" id="login-usuario" name="usuario" required />
+        <label for="login-senha">Senha:</label>
+        <input type="password" id="login-senha" name="senha" required />
+        <p class="form-erro" id="loginErro"></p>
+        <button type="submit">Login</button>
+        <button type="button" class="fechar-modal" data-modal="loginDialog">Cancelar</button>
+
       </form>
 
     </dialog>
