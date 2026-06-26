@@ -1,14 +1,8 @@
-html {
-    font-family:Puritan; 
-}
+html { font-family: Puritan, sans-serif; }
 
-body{
-    margin: 0;
-    background: #fefae0;
-    
-}
+body { margin: 0; background: #fefae0; }
 
-header{
+header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,95 +11,52 @@ header{
     color: white;
 }
 
-footer{
+footer {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1em;
     background: #67743d;
     color: white;
-    font-family: Puritan extra-bold;
 }
+footer a { color: #fefae0; }
 
-button{
+button {
     padding: .5em 1em;
     border: none;
     border-radius: .2em;
     background: #fefae0;
     color: #67743d;
     font-weight: bold;
-    cursor: pointer;   
-    
+    cursor: pointer;
 }
+button:hover { background: #d8d5bf; }
 
-button:hover{
-    background: #d8d5bf;
-}
-
-main p {
+/* Apenas o <p> filho direto do main — não vaza para os cards */
+main > p {
     text-align: center;
     font-size: 2em;
     margin: 2em 0;
     color: #67743d;
 }
 
-/* Estilos para os dialogs */
-dialog {
-    padding: 2em;
-    border-radius: 0.5em;
-    border: none;
-    width: 400px;
-    background: #67743d;
-    text-align: center;
-}
+/* Dialogs */
+dialog { padding: 2em; border-radius: .5em; border: none; width: 400px; background: #67743d; text-align: center; }
+dialog::backdrop { background: rgba(0,0,0,.5); }
+dialog form { display: flex; flex-direction: column; gap: 1em; }
+dialog h2 { color: #fefae0; margin-top: 0; }
+dialog label { color: #fefae0; font-weight: bold; }
+dialog input { padding: .5em; border: 1px solid #fefae0; border-radius: .2em; }
+dialog button { margin: 1em auto 0; padding: .7em; width: 50%; }
+dialog .form-erro { color: #ffb4b4; font-weight: bold; margin: 0; min-height: 1.2em; }
+dialog .fechar-modal { background: transparent; border: 1px solid #fefae0; color: #fefae0; }
 
-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-}
+#nomeUsuarioLogado { font-weight: bold; }
 
-dialog form {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-}
-
-dialog h2 {
-    color: #fefae0;
-    margin-top: 0;
-}
-
-dialog label {
-    color: #fefae0;;
-    font-weight: bold;
-}
-
-dialog input {
-    padding: 0.5em;
-    border: 1px solid #fefae0;;
-    border-radius: 0.2em;
-}
-
-dialog button {
-    margin: 1em auto 0;
-    padding: 0.7em;
-    width: 50%;
-}
-
-.carrossel {
-    margin: 100px auto;
-    max-width: 1450px;
-    /*outline: 5px solid red;*/
-    display: flex;
-    /*overflow: hidden;*/
-}
-
-.grupo-albuns {
-    padding-block: 1em;
-    display: flex;    
-    gap: 1em; 
-}
-
-
+/* ═══════════════════════════════════════════════════════
+   CARROSSEL (index.html / app.js)
+   Usa: .carrossel > .grupo-albuns > .musica-card > a.capa-wrapper
+   ═══════════════════════════════════════════════════════ */
 
 .carrossel-titulo {
     text-align: center;
@@ -113,7 +64,19 @@ dialog button {
     margin-top: 2em;
 }
 
-/* Cards de música do Last.fm */
+.carrossel {
+    margin: 2em auto;
+    max-width: 1450px;
+    display: flex;
+}
+
+.grupo-albuns {
+    padding-block: 1em;
+    display: flex;
+    gap: 1em;
+}
+
+/* card do carrossel — tamanho fixo porque o carrossel é scroll horizontal */
 .musica-card {
     flex: 0 0 14em;
     height: 14em;
@@ -121,7 +84,7 @@ dialog button {
     padding: 0;
     border-radius: .6em;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
     text-align: left;
     position: relative;
 }
@@ -131,6 +94,7 @@ dialog button {
     display: block;
     width: 100%;
     height: 100%;
+    text-decoration: none;
 }
 
 .musica-card img {
@@ -142,8 +106,7 @@ dialog button {
 
 .musica-card .posicao {
     position: absolute;
-    top: .5em;
-    left: .5em;
+    top: .5em; left: .5em;
     background: #67743d;
     color: #fefae0;
     font-weight: bold;
@@ -155,10 +118,8 @@ dialog button {
 
 .musica-card .musica-info {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.16);
+    left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,.16);
     backdrop-filter: blur(2px);
     padding: .5em .7em .6em;
     z-index: 2;
@@ -189,6 +150,14 @@ dialog button {
     margin: 0;
 }
 
+/* p dentro de musica-info não deve herdar main > p */
+.musica-card p {
+    font-size: inherit;
+    text-align: left;
+    color: inherit;
+    margin: 0;
+}
+
 .album-loading,
 .album-erro {
     flex: 0 0 100%;
@@ -197,11 +166,10 @@ dialog button {
     font-size: 1.2rem;
 }
 
-.carrossel[data-animate="true"]{
+.carrossel[data-animate="true"] {
     overflow: hidden;
-    -webkit-mask: linear-gradient(90deg,transparent, white 20%, white 80%, transparent); /*para o cromium*/
-    mask: linear-gradient(90deg,transparent, white 20%, white 80%, transparent);
-
+    -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
 }
 .carrossel[data-animate="true"] .grupo-albuns {
     width: max-content;
@@ -210,9 +178,105 @@ dialog button {
     backface-visibility: hidden;
     animation: scroll var(--carrossel-duration, 40s) linear infinite;
 }
-
 @keyframes scroll {
-    to {
-        transform: translate3d(calc(-1 * var(--carrossel-distance, 0px)), 0, 0);
-    }
+    to { transform: translate3d(calc(-1 * var(--carrossel-distance, 0px)), 0, 0); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRID HOME (home.html / home.js)
+   Usa: .musicas-grid > .card
+   Imagem via background-image — sem filhos com height
+   ═══════════════════════════════════════════════════════ */
+
+.grid-titulo {
+    text-align: center;
+    color: #67743d;
+    margin: 1.5em 0 1em;
+}
+
+.musicas-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1em;
+    max-width: 1450px;
+    margin: 0 auto 3em;
+    padding: 0 1.5em;
+    box-sizing: border-box;
+}
+
+/* Proporção quadrada via padding-bottom: 100% */
+.card {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    border-radius: .6em;
+    overflow: hidden;
+    background-color: #d8d5bf;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.card-badge {
+    position: absolute;
+    top: .5em; left: .5em;
+    background: #67743d;
+    color: #fefae0;
+    font-weight: bold;
+    font-size: .78rem;
+    padding: .2em .55em;
+    border-radius: 1em;
+    line-height: 1.4;
+    z-index: 2;
+}
+
+.card-info {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 2;
+    padding: .45em .6em .5em;
+    background: rgba(0,0,0,.48);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.card-nome {
+    font-weight: bold;
+    color: #fefae0;
+    font-size: .82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: .1em;
+}
+
+.card-artista {
+    font-size: .74rem;
+    color: #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: .1em;
+}
+
+.card-plays {
+    font-size: .68rem;
+    color: #bbb;
+}
+
+.grid-erro {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #67743d;
+    font-size: 1.1rem;
+    padding: 2em 0;
+}
+@media (max-width: 1100px) {
+    .musicas-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 650px) {
+    .musicas-grid { grid-template-columns: repeat(2, 1fr); }
 }

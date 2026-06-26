@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <link href="https://fonts.googleapis.com/css2?family=Puritan:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SoundMark</title>
-    <link rel="stylesheet" href="./style.css" />
-    <script type="text/javascript" src="app.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoundMark</title>
+  <link href="https://fonts.googleapis.com/css2?family=Puritan:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
 </head>
+<body>
 
-<header class="home-header"> 
+  <header class="site-header">
     <h1>SoundMark</h1>
-    <div class="pesquisa">
-    <label for="pesquisa">Pesquisar:</label>
-    <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite o nome da música" />
+    <div class="buttons">
+      <span id="nomeUsuarioLogado"></span>
+      <button id="logoutBtn">Sair</button>
     </div>
-    <div class="button">
-        <button id="Minhas Avaliações">Minhas Avaliações</button>
-    </div>
-</header>
+  </header>
 
+  <main class="site-main">
+    <p>Você está logado. As avaliações vêm na próxima etapa.</p>
+
+    <h2 class="grid-titulo">Músicas mais tocadas do momento</h2>
+
+    <div class="musicas-grid" id="musicas-grid">
+      <div class="album album-loading">Carregando...</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <small>SoundMark - Dados musicais via <a href="https://www.last.fm" target="_blank" rel="noopener noreferrer">Last.fm</a></small>
+  </footer>
+
+  <script src="./home.js"></script>
+</body>
 </html>

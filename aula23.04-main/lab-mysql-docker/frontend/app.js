@@ -8,10 +8,6 @@ const cadastroForm = document.getElementById('cadastroForm');
 const loginForm = document.getElementById('loginForm');
 const cadastroErro = document.getElementById('cadastroErro');
 const loginErro = document.getElementById('loginErro');
-const botoesVisitante = document.getElementById('botoesVisitante');
-const areaLogado = document.getElementById('areaLogado');
-const nomeUsuarioLogado = document.getElementById('nomeUsuarioLogado');
-const logoutBtn = document.getElementById('logoutBtn');
 
 // --- Configuração da API do Last.fm ---
 const LASTFM_API_KEY = 'f5a143c4b5fefd5d6776ce666e553c11';
@@ -286,8 +282,8 @@ cadastroForm.addEventListener('submit', async (evento) => {
     }
 
     cadastroForm.reset();
-    cadastrarModal.close();
-    aplicarSessaoLogada(dados.usuario);
+    // cadastro (e login automático) concluído: leva o usuário para a home
+    window.location.href = 'home.html';
   } catch (error) {
     console.error('Erro ao cadastrar:', error);
     cadastroErro.textContent = 'Erro de conexão com o servidor';
@@ -317,53 +313,24 @@ loginForm.addEventListener('submit', async (evento) => {
     }
 
     loginForm.reset();
-    loginModal.close();
-    aplicarSessaoLogada(dados.usuario);
+    // login concluído: leva o usuário para a home
+    window.location.href = 'home.html';
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     loginErro.textContent = 'Erro de conexão com o servidor';
   }
 });
 
-logoutBtn.addEventListener('click', async () => {
-  try {
-    await fetch('/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-  } catch (error) {
-    console.error('Erro ao fazer logout:', error);
-  } finally {
-    aplicarSessaoDeslogada();
-  }
-});
-
-function aplicarSessaoLogada(usuario) {
-  nomeUsuarioLogado.textContent = `Olá, ${usuario.nome}`;
-  botoesVisitante.hidden = true;
-  areaLogado.hidden = false;
-}
-
-function aplicarSessaoDeslogada() {
-  botoesVisitante.hidden = false;
-  areaLogado.hidden = true;
-}
-
-// ao carregar a página, verifica se já existe uma sessão ativa no backend
+// se o usuário já tiver uma sessão ativa e cair na página inicial, manda direto pra home
 async function verificarSessaoAtual() {
   try {
     const resposta = await fetch('/auth/me', { credentials: 'include' });
 
-    if (!resposta.ok) {
-      aplicarSessaoDeslogada();
-      return;
+    if (resposta.ok) {
+      window.location.href = 'home.html';
     }
-
-    const dados = await resposta.json();
-    aplicarSessaoLogada(dados.usuario);
   } catch (error) {
     console.warn('Não foi possível verificar a sessão atual', error);
-    aplicarSessaoDeslogada();
   }
 }
 
