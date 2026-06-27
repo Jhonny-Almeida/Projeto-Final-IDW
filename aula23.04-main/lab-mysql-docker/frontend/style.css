@@ -274,9 +274,121 @@ dialog .fechar-modal { background: transparent; border: 1px solid #fefae0; color
     font-size: 1.1rem;
     padding: 2em 0;
 }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVO
+   ═══════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
     .musicas-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 650px) {
     .musicas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HEADER HOME — barra de pesquisa
+   ═══════════════════════════════════════════════════════ */
+
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: .75em 1.5em;
+    background: #67743d;
+    color: white;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 480px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 2em;
+    overflow: hidden;
+    transition: background .2s, border-color .2s;
+}
+
+.search-form:focus-within {
+    background: rgba(255,255,255,.25);
+    border-color: rgba(255,255,255,.7);
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: .5em 1em;
+    font-size: .95rem;
+    font-family: Puritan, sans-serif;
+    color: #fefae0;
+}
+
+.search-input::placeholder { color: rgba(254,250,224,.6); }
+
+/* remove o X nativo do input type=search */
+.search-input::-webkit-search-cancel-button { display: none; }
+
+.search-btn {
+    background: transparent;
+    border: none;
+    padding: .5em .9em;
+    cursor: pointer;
+    color: #fefae0;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+}
+
+.search-btn:hover { background: rgba(255,255,255,.15); }
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: .75em;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* cabeçalho do grid (título + botão voltar lado a lado) */
+.grid-header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    max-width: 1450px;
+    margin: 1.5em auto .5em;
+    padding: 0 1.5em;
+}
+
+.grid-header .grid-titulo { margin: 0; }
+
+.btn-voltar {
+    background: #67743d;
+    color: #fefae0;
+    border: none;
+    border-radius: 2em;
+    padding: .35em 1em;
+    font-size: .85rem;
+    cursor: pointer;
+    font-family: Puritan, sans-serif;
+    white-space: nowrap;
+}
+
+.btn-voltar:hover { background: #556030; }
+
+.grid-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #67743d;
+    font-size: 1.1rem;
+    padding: 2em 0;
 }

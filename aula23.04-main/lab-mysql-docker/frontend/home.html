@@ -11,16 +11,34 @@
 
   <header class="site-header">
     <h1>SoundMark</h1>
-    <div class="buttons">
+
+    <form class="search-form" id="searchForm" role="search">
+      <input
+        type="search"
+        id="searchInput"
+        class="search-input"
+        placeholder="Buscar música ou artista..."
+        autocomplete="off"
+      />
+      <button type="submit" class="search-btn" aria-label="Buscar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </form>
+
+    <div class="header-user">
       <span id="nomeUsuarioLogado"></span>
       <button id="logoutBtn">Sair</button>
     </div>
   </header>
 
   <main class="site-main">
-    <p>Você está logado. As avaliações vêm na próxima etapa.</p>
 
-    <h2 class="grid-titulo">Músicas mais tocadas do momento</h2>
+    <div class="grid-header">
+      <h2 class="grid-titulo" id="gridTitulo">Músicas mais tocadas do momento</h2>
+      <button class="btn-voltar" id="btnVoltar" hidden>← Voltar ao top</button>
+    </div>
 
     <div class="musicas-grid" id="musicas-grid">
       <div class="album album-loading">Carregando...</div>
