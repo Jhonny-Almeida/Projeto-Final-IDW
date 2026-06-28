@@ -1,6 +1,16 @@
-html { font-family: Puritan, sans-serif; }
+html { font-family: Puritan, sans-serif; height: 100%; }
 
-body { margin: 0; background: #fefae0; }
+body {
+    margin: 0;
+    background: #fefae0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
 
 header {
     display: flex;

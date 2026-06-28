@@ -1,294 +1,210 @@
-# 🧪 MySQL + Docker Compose + Node.js API Lab
+# 🎵 SoundMark
 
-> Laboratório prático para estudo de **banco de dados conteinerizado**, **SQL** e **integração com API**, seguindo boas práticas de arquitetura.
+> Aplicação web para avaliar músicas e artistas, com autenticação de usuários, persistência em MySQL e integração com a API do **Last.fm**. Todo o ambiente é orquestrado via **Docker Compose** (Nginx + Node.js/Express + MySQL).
 
 ---
 
 ## 📌 Visão Geral
 
-Este projeto demonstra como:
+O SoundMark permite que um usuário:
 
-* Subir um **MySQL** com Docker Compose
-* Garantir **persistência de dados**
-* Inicializar o banco automaticamente com SQL
-* Integrar com uma **API Node.js**
-* Executar operações CRUD via API
+* Crie uma conta e faça login (sessão autenticada)
+* Busque artistas e músicas usando a API do Last.fm
+* Registre avaliações (nota de 1 a 5, comentário e capa do álbum) das músicas que ouviu
+* Liste, edite seus dados e exclua suas próprias avaliações
 
 ---
 
 ## 🏗️ Arquitetura
 
-### 📊 Visão de alto nível
-
-```mermaid id="arch01"
+```mermaid
 flowchart LR
-    User[Usuário / Cliente HTTP]
-    API[API Node.js]
-    DB[(MySQL Database)]
-    Volume[(Docker Volume)]
+    User[Usuário / Browser]
+    Nginx[Nginx :8080]
+    API[API Node.js/Express :3000]
+    MySQL[(MySQL :3306)]
+    LastFM[(Last.fm API)]
 
-    User -->|HTTP Request| API
-    API -->|SQL Query| DB
-    DB -->|Data| API
-    API -->|JSON Response| User
-    DB --> Volume
+    User -->|HTTP| Nginx
+    Nginx -->|/usuarios, /auth, /avaliacoes, /lastfm| API
+    Nginx -->|arquivos estáticos| User
+    API -->|SQL| MySQL
+    API -->|proxy de requisições| LastFM
 ```
 
----
+A aplicação roda em três containers:
 
-### 🔗 Comunicação entre containers
-
-```mermaid id="arch02"
-flowchart TD
-    subgraph Docker Network
-        App[Container App]
-        MySQL[Container MySQL]
-    end
-
-    App -->|TCP 3306| MySQL
-```
-
----
-
-### 💾 Persistência de dados
-
-```mermaid id="arch03"
-flowchart LR
-    MySQL -->|/var/lib/mysql| Volume[Docker Volume]
-```
+| Container | Papel |
+| --- | --- |
+| `nginx_lab` | Serve o frontend estático e faz proxy reverso das rotas da API |
+| `app_lab` | API Node.js/Express (autenticação, usuários, avaliações, proxy Last.fm) |
+| `mysql_lab` | Banco de dados MySQL 8, com volume persistente |
 
 ---
 
 ## 📦 Estrutura do Projeto
 
-```bash id="tree01"
-lab-mysql-docker/
+```text
+soundMark/
 ├── docker-compose.yml
+├── .env                       # LASTFM_API_KEY
 ├── db/
-│   └── init.sql
-└── app/
-    ├── Dockerfile
-    ├── package.json
-    └── index.js
+│   └── init.sql               # criação das tabelas usuarios e avaliacoes
+├── nginx/
+│   └── default.conf           # proxy reverso para a API
+├── app/                       # API Node.js
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js              # bootstrap do Express
+│   ├── db.js                  # pool MySQL + migrations automáticas
+│   ├── middlewares/
+│   │   └── auth.js            # exige sessão autenticada
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── usuariosController.js
+│   │   ├── avaliacoesController.js
+│   │   └── lastfmController.js
+│   ├── services/
+│   │   ├── usuariosService.js
+│   │   └── avaliacoesService.js
+│   └── routes/
+│       ├── auth.js
+│       ├── usuarios.js
+│       └── lastfm.js
+└── frontend/                  # HTML/CSS/JS puro
+    ├── index.html / app.js    # cadastro/login
+    ├── home.html / home.js    # busca e avaliação de músicas
+    ├── user.html / user.js    # perfil e avaliações do usuário
+    ├── frontend.lastfm.js     # chamadas à API do Last.fm via proxy
+    └── style.css
 ```
 
 ---
 
 ## ⚙️ Stack Tecnológica
 
-| Camada         | Tecnologia        |
-| -------------- | ----------------- |
-| Container      | Docker            |
-| Orquestração   | Docker Compose    |
-| Banco de Dados | MySQL 8           |
-| Backend        | Node.js + Express |
-| Driver DB      | mysql2            |
+| Camada | Tecnologia |
+| --- | --- |
+| Frontend | HTML, CSS e JavaScript puro |
+| Proxy / Servidor estático | Nginx |
+| Backend | Node.js + Express |
+| Sessão | express-session |
+| Hash de senha | bcryptjs |
+| Banco de Dados | MySQL 8 (driver `mysql2`) |
+| API externa | Last.fm |
+| Containers | Docker + Docker Compose |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Como executar
 
-### 1. Clonar o projeto
+### 1. Pré-requisitos
 
-```bash id="clone01"
-git clone <repo-url>
-cd lab-mysql-docker
+* Docker e Docker Compose instalados
+* Uma chave de API do Last.fm ([obter aqui](https://www.last.fm/api/account/create))
+
+### 2. Configurar variáveis de ambiente
+
+Dentro de `soundMark/`, crie/edite o arquivo `.env`:
+
+```env
+LASTFM_API_KEY=sua_chave_aqui
+```
+
+### 3. Subir o ambiente
+
+```bash
+cd soundMark
+docker-compose up -d --build
+```
+
+### 4. Acessar a aplicação
+
+* Frontend: http://localhost:8080
+* API (sem passar pelo Nginx): http://localhost:3000
+
+### 5. Parar o ambiente
+
+```bash
+docker-compose down
+```
+
+Para remover também os dados do banco:
+
+```bash
+docker-compose down -v
 ```
 
 ---
 
-### 2. Subir o ambiente
+## 🧠 Banco de Dados
 
-```bash id="up01"
-docker-compose up -d
-```
+O script `db/init.sql` é executado automaticamente na primeira inicialização do container MySQL e cria as tabelas:
 
----
+* **usuarios** — `id`, `nome` (único), `senha_hash`, `created_at`
+* **avaliacoes** — `id`, `usuario_id` (FK), `musica`, `artista`, `nota` (1–5), `comentario`, `capa_url`, `created_at`
 
-### 3. Verificar containers
+Além disso, o arquivo `app/db.js` executa migrations idempotentes a cada inicialização da API, garantindo que a tabela `avaliacoes` exista com todas as colunas mesmo em volumes antigos.
 
-```bash id="ps01"
-docker ps
-```
-
----
-
-### 4. Acessar API
-
-```text id="api01"
-http://localhost:3000/usuarios
-```
-
----
-
-## 🧠 Inicialização do Banco
-
-O arquivo `db/init.sql` é executado automaticamente na primeira inicialização do container.
-
-### 📄 Exemplo:
-
-```sql id="sql01"
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100),
-    email VARCHAR(100)
-);
-```
-
----
-
-## 🔌 Conexão com Banco
-
-| Parâmetro | Valor   |
-| --------- | ------- |
-| Host      | mysql   |
-| Porta     | 3306    |
-| Database  | lab_db  |
-| User      | user    |
-| Password  | user123 |
+| Parâmetro | Valor |
+| --- | --- |
+| Host | mysql |
+| Porta | 3306 |
+| Database | lab_db |
+| Usuário | user |
+| Senha | user123 |
 
 ---
 
 ## 🌐 Endpoints da API
 
-### 📌 GET /usuarios
+### Autenticação (`/auth`)
 
-Retorna todos os usuários:
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| POST | `/auth/cadastro` | Cria um novo usuário (nome, senha, confirmarSenha) |
+| POST | `/auth/login` | Autentica o usuário e abre sessão |
+| POST | `/auth/logout` | Encerra a sessão |
+| GET | `/auth/me` | Retorna o usuário autenticado na sessão |
 
-```json id="json01"
-[
-  {
-    "id": 1,
-    "nome": "Ana Silva",
-    "email": "ana@email.com"
-  }
-]
-```
+### Usuários (`/usuarios`) — requer login
 
----
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/usuarios` | Lista todos os usuários |
+| GET | `/usuarios/:id` | Busca um usuário por ID |
+| PUT | `/usuarios/:id` | Atualiza o nome de um usuário |
+| DELETE | `/usuarios/:id` | Remove um usuário |
 
-## 🔄 Ciclo de Vida dos Containers
+### Avaliações (`/avaliacoes`) — requer login
 
-```mermaid id="lifecycle01"
-stateDiagram-v2
-    [*] --> Build
-    Build --> Running
-    Running --> Stopped
-    Stopped --> Running
-    Running --> Removed
-```
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| POST | `/avaliacoes` | Cria uma avaliação (música, artista, nota, comentário, capa_url) |
+| GET | `/avaliacoes` | Lista as avaliações do usuário logado |
+| DELETE | `/avaliacoes/:id` | Remove uma avaliação do usuário logado |
 
----
+### Last.fm (`/lastfm`) — proxy para a API externa
 
-## 💾 Persistência
+| Método | Rota | Parâmetros | Descrição |
+| --- | --- | --- | --- |
+| GET | `/lastfm/artist-info` | `artista` | Informações sobre um artista |
+| GET | `/lastfm/top-tracks` | `limite` (opcional) | Ranking de músicas mais populares |
+| GET | `/lastfm/track-search` | `termo`, `limite` (opcional, padrão 18) | Busca músicas por termo |
 
-* Utiliza volume Docker:
+### Health check
 
-```yaml id="vol01"
-volumes:
-  mysql_data:
-```
-
-* Dados permanecem mesmo após `docker-compose down`
-
----
-
-## 🧹 Reset do Ambiente
-
-```bash id="reset01"
-docker-compose down -v
-```
-
-⚠️ Remove todos os dados
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/health` | Verifica se a API está no ar |
 
 ---
 
-## 🧪 Testes Manuais
+## 🔐 Autenticação
 
-### Acessar MySQL:
-
-```bash id="mysql01"
-docker exec -it mysql_lab mysql -u user -p
-```
+A autenticação é feita via **sessão** (`express-session`), armazenada em memória no servidor. Após login ou cadastro, o servidor guarda `{ id, nome }` na sessão e o middleware `exigirLogin` bloqueia rotas protegidas (usuários, avaliações) para quem não estiver autenticado, retornando `401`.
 
 ---
 
-## 🧠 Conceitos Demonstrados
 
-* Containerização de banco de dados
-* Rede interna Docker
-* Persistência com volumes
-* Inicialização automática via script SQL
-* Integração backend ↔ banco
-* CRUD com SQL
 
----
-
-## 🔐 Boas Práticas (Sugestões)
-
-* Não usar usuário root em produção
-* Externalizar credenciais (env vars / secrets)
-* Versionar scripts SQL
-* Usar migrations (ex: Flyway, Prisma)
-
----
-
-## 🧪 Roadmap de Evolução
-
-* [ ] Adicionar endpoint POST /usuarios
-* [ ] Implementar validação de dados
-* [ ] Adicionar ORM (Sequelize ou Prisma)
-* [ ] Criar testes automatizados
-* [ ] Integrar com CI/CD
-* [ ] Migrar para Kubernetes (StatefulSet)
-* [ ] Adicionar observabilidade
-
----
-
-## 🔧 Ferramentas Recomendadas
-
-* DBeaver
-* MySQL Workbench
-* VS Code
-* Postman / Insomnia
-
----
-
-## 📚 Referências
-
-* https://docs.docker.com/
-* https://hub.docker.com/_/mysql
-* https://dev.mysql.com/doc/
-* https://expressjs.com/
-* https://www.w3schools.com/sql/
-
----
-
-## 👨‍💻 Contribuição
-
-Contribuições são bem-vindas!
-
-1. Fork do projeto
-2. Crie uma branch (`feature/nova-feature`)
-3. Commit suas mudanças
-4. Push para o repositório
-5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-Este projeto é destinado a fins educacionais.
-
----
-
-## 🏁 Conclusão
-
-Este projeto serve como base para evolução em:
-
-* Arquitetura de aplicações
-* DevOps (CI/CD)
-* Containers e Orquestração
-* Integração com cloud
-
----
