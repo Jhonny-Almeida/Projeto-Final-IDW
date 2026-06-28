@@ -34,8 +34,7 @@ protegerPagina();
 
 // ── Constantes Last.fm ────────────────────────────────────────────────────────
 
-const LASTFM_API_KEY    = 'f5a143c4b5fefd5d6776ce666e553c11';
-const LASTFM_BASE_URL   = 'https://ws.audioscrobbler.com/2.0/';
+const LASTFM_PROXY_URL  = '/lastfm';
 const ITUNES_SEARCH_URL = 'https://itunes.apple.com/search';
 const PLACEHOLDER_HASH  = '2a96cbd8b46e442fc41c2b86b821562f';
 const PLACEHOLDER_IMG   = `https://lastfm.freetls.fastly.net/i/u/300x300/${PLACEHOLDER_HASH}.png`;
@@ -55,7 +54,7 @@ function melhorCapa(imgs) {
 async function buscarLastfm(artista) {
   if (!artista) return null;
   try {
-    const r = await fetch(`${LASTFM_BASE_URL}?method=artist.getinfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artista)}&format=json`);
+    const r = await fetch(`${LASTFM_PROXY_URL}/artist-info?artista=${encodeURIComponent(artista)}`);
     if (!r.ok) return null;
     return melhorCapa((await r.json())?.artist?.image);
   } catch { return null; }
@@ -132,7 +131,7 @@ async function carregarMusicasMaisTocadas() {
   setGridLoading();
 
   try {
-    const resp  = await fetch(`${LASTFM_BASE_URL}?method=chart.gettoptracks&api_key=${LASTFM_API_KEY}&format=json&limit=${TOTAL_CARDS}`);
+    const resp  = await fetch(`${LASTFM_PROXY_URL}/top-tracks?limite=${TOTAL_CARDS}`);
     if (!resp.ok) throw new Error();
     const dados = await resp.json();
     if (dados.error) throw new Error();
@@ -179,7 +178,7 @@ async function pesquisarMusicas(termo) {
   btnVoltar.hidden = false;
 
   try {
-    const url = `${LASTFM_BASE_URL}?method=track.search&track=${encodeURIComponent(termo)}&api_key=${LASTFM_API_KEY}&format=json&limit=18`;
+    const url = `${LASTFM_PROXY_URL}/track-search?termo=${encodeURIComponent(termo)}&limite=18`;
     const resp  = await fetch(url);
     if (!resp.ok) throw new Error();
     const dados = await resp.json();

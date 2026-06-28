@@ -9,9 +9,8 @@ const loginForm = document.getElementById('loginForm');
 const cadastroErro = document.getElementById('cadastroErro');
 const loginErro = document.getElementById('loginErro');
 
-// --- Configuração da API do Last.fm ---
-const LASTFM_API_KEY = 'f5a143c4b5fefd5d6776ce666e553c11';
-const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
+// --- Configuração da API do Last.fm (via proxy do backend) ---
+const LASTFM_PROXY_URL = '/lastfm';
 
 cadastrarBtnInput.onclick = () => {
   cadastroErro.textContent = '';
@@ -64,7 +63,7 @@ async function carregarTopMusicas() {
     return;
   }
 
-  const url = `${LASTFM_BASE_URL}?method=chart.gettoptracks&api_key=${LASTFM_API_KEY}&format=json&limit=${LASTFM_LIMITE_FAIXAS}`;
+  const url = `${LASTFM_PROXY_URL}/top-tracks?limite=${LASTFM_LIMITE_FAIXAS}`;
 
   try {
     const resposta = await fetch(url);
@@ -197,7 +196,7 @@ async function buscarFotoArtistaLastfm(nomeArtista) {
     return null;
   }
 
-  const url = `${LASTFM_BASE_URL}?method=artist.getinfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(nomeArtista)}&format=json`;
+  const url = `${LASTFM_PROXY_URL}/artist-info?artista=${encodeURIComponent(nomeArtista)}`;
 
   try {
     const resposta = await fetch(url);

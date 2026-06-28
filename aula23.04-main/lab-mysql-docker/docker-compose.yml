@@ -24,6 +24,8 @@ services:
     build: ./app
     container_name: app_lab
     restart: always
+    environment:
+      LASTFM_API_KEY: ${LASTFM_API_KEY}
     ports:
       - "3000:3000"
     depends_on:
@@ -43,4 +45,4 @@ services:
       - app
 
 volumes:
-  mysql_data: 
+  mysql_data:

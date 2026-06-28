@@ -1,7 +1,6 @@
 // --- Utilitários compartilhados da API do Last.fm (usados em index.html e home.html) ---
 
-const LASTFM_API_KEY = 'f5a143c4b5fefd5d6776ce666e553c11';
-const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
+const LASTFM_PROXY_URL = '/lastfm';
 const ITUNES_SEARCH_URL = 'https://itunes.apple.com/search';
 const CAPA_PLACEHOLDER = 'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png';
 
@@ -35,7 +34,7 @@ async function buscarFotoArtistaLastfm(nomeArtista) {
     return null;
   }
 
-  const url = `${LASTFM_BASE_URL}?method=artist.getinfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(nomeArtista)}&format=json`;
+  const url = `${LASTFM_PROXY_URL}/artist-info?artista=${encodeURIComponent(nomeArtista)}`;
 
   try {
     const resposta = await fetch(url);
@@ -107,7 +106,7 @@ async function resolverFotoArtista(faixa) {
 
 // busca o top de faixas mais tocadas no momento (chart.gettoptracks)
 async function buscarTopMusicas(limite) {
-  const url = `${LASTFM_BASE_URL}?method=chart.gettoptracks&api_key=${LASTFM_API_KEY}&format=json&limit=${limite}`;
+  const url = `${LASTFM_PROXY_URL}/top-tracks?limite=${limite}`;
 
   const resposta = await fetch(url);
 
