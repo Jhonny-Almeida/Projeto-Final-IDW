@@ -1,7 +1,9 @@
 const express = require('express');
 const session = require('express-session');
-const usuariosRoutes = require('./routes/usuarios');
-const authRoutes = require('./routes/auth');
+const usuariosRoutes  = require('./routes/usuarios');
+const authRoutes      = require('./routes/auth');
+const avaliacoesCtrl  = require('./controllers/avaliacoesController');
+const exigirLogin     = require('./middlewares/auth');
 
 const app = express();
 
@@ -19,8 +21,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.use('/auth', authRoutes);
+app.use('/auth',     authRoutes);
 app.use('/usuarios', usuariosRoutes);
+
+// Rotas de avaliação registradas diretamente — sem depender do arquivo routes/avaliacoes.js
+app.post('/avaliacoes', exigirLogin, avaliacoesCtrl.criar);
+app.get('/avaliacoes',  exigirLogin, avaliacoesCtrl.listarMinhas);
 
 app.listen(3000, () => {
   console.log('API rodando na porta 3000');

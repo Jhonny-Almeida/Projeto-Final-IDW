@@ -34,6 +34,7 @@
   </header>
 
   <main class="site-main">
+    
 
     <div class="grid-header">
       <h2 class="grid-titulo" id="gridTitulo">Músicas mais tocadas do momento</h2>
@@ -48,6 +49,56 @@
   <footer class="site-footer">
     <small>SoundMark - Dados musicais via <a href="https://www.last.fm" target="_blank" rel="noopener noreferrer">Last.fm</a></small>
   </footer>
+
+  <!-- ── Modal de avaliação ── -->
+  <dialog class="modal-avaliacao" id="modalAvaliacao">
+    <div class="modal-corpo">
+
+      <!-- Coluna esquerda -->
+      <div class="modal-esquerda">
+        <div class="modal-capa-wrapper">
+          <img id="modalCapa" src="" alt="Capa da música" class="modal-capa" />
+        </div>
+        <div class="modal-detalhes">
+          <p class="modal-musica-nome" id="modalNome">—</p>
+          <p class="modal-musica-artista" id="modalArtista">—</p>
+          <p class="modal-musica-plays" id="modalPlays"></p>
+        </div>
+      </div>
+
+      <!-- Coluna direita -->
+      <div class="modal-direita">
+        <div class="modal-estrelas-area">
+          <p class="modal-label">Sua avaliação</p>
+          <div class="estrelas" id="estrelasContainer" role="radiogroup" aria-label="Avaliação de 1 a 5 estrelas">
+            <span class="estrela" data-valor="1" role="radio" aria-label="1 estrela" tabindex="0">★</span>
+            <span class="estrela" data-valor="2" role="radio" aria-label="2 estrelas" tabindex="0">★</span>
+            <span class="estrela" data-valor="3" role="radio" aria-label="3 estrelas" tabindex="0">★</span>
+            <span class="estrela" data-valor="4" role="radio" aria-label="4 estrelas" tabindex="0">★</span>
+            <span class="estrela" data-valor="5" role="radio" aria-label="5 estrelas" tabindex="0">★</span>
+          </div>
+        </div>
+
+        <div class="modal-comentario-area">
+          <label class="modal-label" for="modalComentario">Comentário</label>
+          <textarea
+            id="modalComentario"
+            class="modal-comentario"
+            placeholder="O que você achou desta música?"
+            maxlength="500"
+            rows="5"
+          ></textarea>
+          <span class="modal-contador">0 / 500</span>
+        </div>
+
+        <div class="modal-acoes">
+          <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
+          <button class="btn-avaliar" id="btnAvaliar">Avaliar</button>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
 
   <script src="./home.js"></script>
 </body>

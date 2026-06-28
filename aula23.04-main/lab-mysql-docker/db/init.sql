@@ -4,3 +4,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS avaliacoes (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id  INT NOT NULL,
+    musica      VARCHAR(255) NOT NULL,
+    artista     VARCHAR(255) NOT NULL,
+    nota        TINYINT UNSIGNED NOT NULL CHECK (nota BETWEEN 0 AND 5),
+    comentario  TEXT,
+    capa_url    VARCHAR(500),
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);

@@ -392,3 +392,209 @@ dialog .fechar-modal { background: transparent; border: 1px solid #fefae0; color
     font-size: 1.1rem;
     padding: 2em 0;
 }
+
+/* ═══════════════════════════════════════════════════════
+   MODAL DE AVALIAÇÃO
+   ═══════════════════════════════════════════════════════ */
+
+.modal-avaliacao {
+    border: none;
+    border-radius: 1em;
+    padding: 0;
+    width: min(860px, 95vw);
+    background: #fefae0;
+    box-shadow: 0 8px 40px rgba(0,0,0,.35);
+    overflow: hidden;
+}
+
+.modal-avaliacao::backdrop {
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(3px);
+}
+
+.modal-corpo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 420px;
+}
+
+/* ── Coluna esquerda ── */
+.modal-esquerda {
+    display: flex;
+    flex-direction: column;
+    background: #67743d;
+}
+
+.modal-capa-wrapper {
+    flex: 1;
+    overflow: hidden;
+}
+
+.modal-capa {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.modal-detalhes {
+    padding: 1em 1.2em 1.2em;
+    background: rgba(0,0,0,.25);
+}
+
+.modal-musica-nome {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #fefae0;
+    margin: 0 0 .25em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-musica-artista {
+    font-size: .88rem;
+    color: #d8d5bf;
+    margin: 0 0 .2em;
+}
+
+.modal-musica-plays {
+    font-size: .78rem;
+    color: #aaa;
+    margin: 0;
+}
+
+/* ── Coluna direita ── */
+.modal-direita {
+    display: flex;
+    flex-direction: column;
+    padding: 1.4em 1.4em 1.2em;
+    gap: 1.1em;
+}
+
+.modal-label {
+    font-weight: bold;
+    color: #67743d;
+    font-size: .88rem;
+    margin: 0 0 .5em;
+    display: block;
+}
+
+/* Estrelas */
+.modal-estrelas-area {
+    flex-shrink: 0;
+}
+
+.estrelas {
+    display: flex;
+    gap: .2em;
+}
+
+.estrela {
+    font-size: 2.2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color .15s, transform .1s;
+    user-select: none;
+    line-height: 1;
+}
+
+.estrela:hover,
+.estrela.ativa {
+    color: #e6a817;
+}
+
+.estrela:hover { transform: scale(1.15); }
+
+/* Comentário */
+.modal-comentario-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-comentario {
+    flex: 1;
+    resize: none;
+    border: 1.5px solid #c8c4a8;
+    border-radius: .5em;
+    padding: .7em .9em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    color: #333;
+    background: #fff;
+    outline: none;
+    transition: border-color .2s;
+    min-height: 100px;
+}
+
+.modal-comentario:focus {
+    border-color: #67743d;
+}
+
+.modal-contador {
+    font-size: .72rem;
+    color: #999;
+    text-align: right;
+    margin-top: .3em;
+}
+
+/* Botões de ação */
+.modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: .75em;
+    flex-shrink: 0;
+}
+
+.btn-cancelar {
+    background: transparent;
+    border: 1.5px solid #aaa;
+    color: #666;
+    border-radius: 2em;
+    padding: .5em 1.4em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+}
+
+.btn-cancelar:hover {
+    border-color: #67743d;
+    color: #67743d;
+}
+
+.btn-avaliar {
+    background: #67743d;
+    border: none;
+    color: #fefae0;
+    border-radius: 2em;
+    padding: .5em 1.6em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-avaliar:hover { background: #556030; }
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .modal-corpo {
+        grid-template-columns: 1fr;
+    }
+    .modal-capa-wrapper {
+        height: 200px;
+    }
+}
+
+/* Feedback do modal (erro / sucesso) */
+.modal-feedback {
+    font-size: .82rem;
+    margin: 0;
+    min-height: 1.1em;
+    text-align: right;
+}
+.modal-feedback--erro   { color: #c0392b; }
+.modal-feedback--sucesso { color: #27ae60; font-weight: bold; }

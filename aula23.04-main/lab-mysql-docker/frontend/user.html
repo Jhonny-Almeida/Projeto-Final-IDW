@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoundMark – Minhas avaliações</title>
+  <link href="https://fonts.googleapis.com/css2?family=Puritan:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>SoundMark</h1>
+
+    <div class="header-user">
+      <button class="btn-home" onclick="window.location.href='home.html'">← Home</button>
+      <span id="nomeUsuarioLogado"></span>
+      <button id="logoutBtn">Sair</button>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <div class="grid-header">
+      <h2 class="grid-titulo" id="gridTitulo">Minhas avaliações</h2>
+    </div>
+
+    <div class="musicas-grid" id="avaliacoes-grid">
+      <div class="grid-loading">Carregando...</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <small>SoundMark - Dados musicais via <a href="https://www.last.fm" target="_blank" rel="noopener noreferrer">Last.fm</a></small>
+  </footer>
+
+  <!-- ── Modal de visualização ── -->
+  <dialog class="modal-avaliacao" id="modalVer">
+    <div class="modal-corpo">
+
+      <!-- Coluna esquerda -->
+      <div class="modal-esquerda">
+        <div class="modal-capa-wrapper">
+          <img id="verCapa" src="" alt="Capa da música" class="modal-capa" />
+        </div>
+        <div class="modal-detalhes">
+          <p class="modal-musica-nome"  id="verNome">—</p>
+          <p class="modal-musica-artista" id="verArtista">—</p>
+          <p class="modal-musica-plays" id="verPlays"></p>
+        </div>
+      </div>
+
+      <!-- Coluna direita -->
+      <div class="modal-direita">
+        <div class="modal-estrelas-area">
+          <p class="modal-label">Avaliação</p>
+          <div class="estrelas" id="verEstrelas">
+            <span class="estrela" data-valor="1">★</span>
+            <span class="estrela" data-valor="2">★</span>
+            <span class="estrela" data-valor="3">★</span>
+            <span class="estrela" data-valor="4">★</span>
+            <span class="estrela" data-valor="5">★</span>
+          </div>
+        </div>
+
+        <div class="modal-comentario-area">
+          <p class="modal-label">Comentário</p>
+          <div class="modal-comentario-leitura" id="verComentario"></div>
+        </div>
+
+        <div class="modal-acoes">
+          <button class="btn-excluir" id="btnExcluir">🗑 Excluir avaliação</button>
+          <button class="btn-cancelar" id="btnFecharVer">Fechar</button>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- ── Confirm de exclusão ── -->
+  <dialog class="modal-confirm" id="modalConfirm">
+    <div class="modal-confirm-corpo">
+      <p class="modal-confirm-msg">Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita.</p>
+      <div class="modal-confirm-acoes">
+        <button class="btn-cancelar" id="btnCancelarExclusao">Cancelar</button>
+        <button class="btn-excluir-confirm" id="btnConfirmarExclusao">Excluir</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="./user.js"></script>
+</body>
+</html>

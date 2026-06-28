@@ -82,6 +82,22 @@ function criarCard(dados) {
       ${dados.plays ? `<div class="card-plays">${dados.plays}</div>` : ''}
     </div>
   `;
+
+  // abre modal ao clicar no card
+  // lê o backgroundImage no momento do clique para pegar a capa já carregada
+  card.addEventListener('click', () => {
+    const bgAtual = card.style.backgroundImage;
+    const imgSrcAtual = bgAtual
+      ? bgAtual.replace(/^url\(['"]*/, '').replace(/['"]*\)$/, '')
+      : dados.imgSrc;
+    window.abrirModalAvaliacao({
+      nome:    dados.nome,
+      artista: dados.artista,
+      plays:   dados.plays,
+      imgSrc:  imgSrcAtual,
+    });
+  });
+
   return card;
 }
 
@@ -228,3 +244,142 @@ btnVoltar.addEventListener('click', voltarAoTop);
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 carregarMusicasMaisTocadas();
+
+// ── Modal de avaliação ────────────────────────────────────────────────────────
+
+const modalAvaliacao = document.getElementById('modalAvaliacao');
+const modalCapa      = document.getElementById('modalCapa');
+const modalNome      = document.getElementById('modalNome');
+const modalArtista   = document.getElementById('modalArtista');
+const modalPlays     = document.getElementById('modalPlays');
+const btnCancelar    = document.getElementById('btnCancelar');
+const btnAvaliar     = document.getElementById('btnAvaliar');
+const estrelas       = document.querySelectorAll('.estrela');
+const comentario     = document.getElementById('modalComentario');
+const contador       = document.querySelector('.modal-contador');
+
+let estrelaSelecionada = 0;
+
+let dadosModalAtual = {};
+
+function abrirModal(dados) {
+  dadosModalAtual = dados; // guarda para usar no btnAvaliar
+
+  // preenche os dados da música
+  modalCapa.src            = dados.imgSrc || PLACEHOLDER_IMG;
+  modalCapa.alt            = `${dados.artista} – ${dados.nome}`;
+  modalNome.textContent    = dados.nome    || '—';
+  modalArtista.textContent = dados.artista || '—';
+  modalPlays.textContent   = dados.plays   || '';
+
+  // reseta estado
+  estrelaSelecionada = 0;
+  atualizarEstrelas(0);
+  comentario.value = '';
+  contador.textContent = '0 / 500';
+  limparFeedback();
+
+  modalAvaliacao.showModal();
+}
+
+function fecharModal() {
+  modalAvaliacao.close();
+}
+
+// highlight de estrelas ao passar o mouse e ao selecionar
+function atualizarEstrelas(valor) {
+  estrelas.forEach(e => {
+    e.classList.toggle('ativa', Number(e.dataset.valor) <= valor);
+  });
+}
+
+estrelas.forEach(estrela => {
+  estrela.addEventListener('mouseenter', () => atualizarEstrelas(Number(estrela.dataset.valor)));
+  estrela.addEventListener('mouseleave', () => atualizarEstrelas(estrelaSelecionada));
+  estrela.addEventListener('click', () => {
+    estrelaSelecionada = Number(estrela.dataset.valor);
+    atualizarEstrelas(estrelaSelecionada);
+  });
+  estrela.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      estrelaSelecionada = Number(estrela.dataset.valor);
+      atualizarEstrelas(estrelaSelecionada);
+    }
+  });
+});
+
+// contador de caracteres do comentário
+comentario.addEventListener('input', () => {
+  contador.textContent = `${comentario.value.length} / 500`;
+});
+
+// fechar ao clicar no backdrop (fora do modal)
+modalAvaliacao.addEventListener('click', (e) => {
+  if (e.target === modalAvaliacao) fecharModal();
+});
+
+btnCancelar.addEventListener('click', fecharModal);
+
+// ── Feedback visual no modal ─────────────────────────────────────────────────
+
+function limparFeedback() {
+  const el = document.getElementById('modalFeedback');
+  if (el) { el.textContent = ''; el.className = 'modal-feedback'; }
+}
+
+function mostrarFeedback(msg, tipo = 'erro') {
+  let el = document.getElementById('modalFeedback');
+  if (!el) {
+    el = document.createElement('p');
+    el.id = 'modalFeedback';
+    document.querySelector('.modal-acoes').before(el);
+  }
+  el.textContent = msg;
+  el.className = `modal-feedback modal-feedback--${tipo}`;
+}
+
+// ── Salvar avaliação no banco ─────────────────────────────────────────────────
+
+btnAvaliar.addEventListener('click', async () => {
+  if (estrelaSelecionada === 0) {
+    mostrarFeedback('Selecione pelo menos 1 estrela antes de avaliar.');
+    return;
+  }
+
+  btnAvaliar.disabled = true;
+  btnAvaliar.textContent = 'Salvando...';
+  limparFeedback();
+
+  try {
+    const resp = await fetch('/avaliacoes', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        musica:     dadosModalAtual.nome,
+        artista:    dadosModalAtual.artista,
+        nota:       estrelaSelecionada,
+        comentario: comentario.value.trim() || null,
+        capa_url:   dadosModalAtual.imgSrc  || null,
+      }),
+    });
+
+    const dados = await resp.json();
+
+    if (!resp.ok) {
+      mostrarFeedback(dados.erro || 'Erro ao salvar avaliação.');
+    } else {
+      mostrarFeedback('Avaliação salva com sucesso!', 'sucesso');
+      setTimeout(fecharModal, 1200);
+    }
+  } catch (err) {
+    console.error('Erro ao salvar avaliação:', err);
+    mostrarFeedback('Erro de conexão. Tente novamente.');
+  } finally {
+    btnAvaliar.disabled = false;
+    btnAvaliar.textContent = 'Avaliar';
+  }
+});
+
+// expõe abrirModal para ser chamado ao clicar no card
+window.abrirModalAvaliacao = abrirModal;
