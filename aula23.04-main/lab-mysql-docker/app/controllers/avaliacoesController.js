@@ -42,4 +42,18 @@ async function listarMinhas(req, res) {
   }
 }
 
-module.exports = { criar, listarMinhas };
+async function deletar(req, res) {
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ erro: 'ID inválido' });
+
+  try {
+    const deletado = await service.deletar(id, req.session.usuario.id);
+    if (!deletado) return res.status(404).json({ erro: 'Avaliação não encontrada' });
+    return res.json({ mensagem: 'Avaliação excluída com sucesso' });
+  } catch (error) {
+    console.error('Erro ao excluir avaliação:', error);
+    return res.status(500).json({ erro: 'Erro interno ao excluir avaliação' });
+  }
+}
+
+module.exports = { criar, listarMinhas, deletar };

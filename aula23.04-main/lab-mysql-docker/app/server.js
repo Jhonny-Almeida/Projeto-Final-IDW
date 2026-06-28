@@ -26,7 +26,8 @@ app.use('/usuarios', usuariosRoutes);
 
 // Rotas de avaliação registradas diretamente — sem depender do arquivo routes/avaliacoes.js
 app.post('/avaliacoes', exigirLogin, avaliacoesCtrl.criar);
-app.get('/avaliacoes',  exigirLogin, avaliacoesCtrl.listarMinhas);
+app.get('/avaliacoes',        exigirLogin, avaliacoesCtrl.listarMinhas);
+app.delete('/avaliacoes/:id', exigirLogin, avaliacoesCtrl.deletar);
 
 app.listen(3000, () => {
   console.log('API rodando na porta 3000');

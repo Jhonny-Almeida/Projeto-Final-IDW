@@ -11,19 +11,19 @@ const PLACEHOLDER_IMG = 'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b
 async function protegerPagina() {
   try {
     const resp = await fetch('/auth/me', { credentials: 'include' });
-    if (!resp.ok) { window.location.href = 'index.html'; return; }
+    if (!resp.ok) { window.location.replace('index.html'); return; }
     const dados = await resp.json();
     nomeUsuarioLogado.textContent = dados.usuario.nome;
     carregarAvaliacoes();
   } catch {
-    window.location.href = 'index.html';
+    window.location.replace('index.html');
   }
 }
 
 logoutBtn.addEventListener('click', async () => {
   try { await fetch('/auth/logout', { method: 'POST', credentials: 'include' }); }
   catch (e) { console.error(e); }
-  finally { window.location.href = 'index.html'; }
+  finally { window.location.replace('index.html'); }
 });
 
 // ── Carregar avaliações ───────────────────────────────────────────────────────

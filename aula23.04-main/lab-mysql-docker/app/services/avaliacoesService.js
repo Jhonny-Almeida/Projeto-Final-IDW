@@ -24,4 +24,12 @@ async function listarPorUsuario(usuarioId) {
   return rows;
 }
 
-module.exports = { criar, buscarPorId, listarPorUsuario };
+async function deletar(id, usuarioId) {
+  const [result] = await db.query(
+    'DELETE FROM avaliacoes WHERE id = ? AND usuario_id = ?',
+    [id, usuarioId]
+  );
+  return result.affectedRows > 0;
+}
+
+module.exports = { criar, buscarPorId, listarPorUsuario, deletar };

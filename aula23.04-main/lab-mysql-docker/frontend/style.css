@@ -598,3 +598,119 @@ dialog .fechar-modal { background: transparent; border: 1px solid #fefae0; color
 }
 .modal-feedback--erro   { color: #c0392b; }
 .modal-feedback--sucesso { color: #27ae60; font-weight: bold; }
+
+/* ═══════════════════════════════════════════════════════
+   BOTÃO PERFIL (home header)
+   ═══════════════════════════════════════════════════════ */
+
+.btn-perfil {
+    background: rgba(255,255,255,.15);
+    border: 1.5px solid rgba(255,255,255,.4);
+    color: #fefae0;
+    border-radius: 2em;
+    padding: .35em 1em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-perfil:hover { background: rgba(255,255,255,.28); }
+
+/* ── Botão voltar home (user header) ── */
+.btn-home {
+    background: rgba(255,255,255,.15);
+    border: 1.5px solid rgba(255,255,255,.4);
+    color: #fefae0;
+    border-radius: 2em;
+    padding: .35em 1em;
+    font-family: Puritan, sans-serif;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+}
+.btn-home:hover { background: rgba(255,255,255,.28); }
+
+/* ═══════════════════════════════════════════════════════
+   MODAL VER — comentário somente leitura
+   ═══════════════════════════════════════════════════════ */
+
+.modal-comentario-leitura {
+    flex: 1;
+    border: 1.5px solid #c8c4a8;
+    border-radius: .5em;
+    padding: .7em .9em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    color: #444;
+    background: #f9f7ee;
+    min-height: 100px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ── Botão excluir ── */
+.btn-excluir {
+    background: #c0392b;
+    border: none;
+    color: #fff;
+    border-radius: 2em;
+    padding: .5em 1.2em;
+    font-family: Puritan, sans-serif;
+    font-size: .88rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-excluir:hover { background: #a93226; }
+
+/* ═══════════════════════════════════════════════════════
+   MODAL DE CONFIRMAÇÃO
+   ═══════════════════════════════════════════════════════ */
+
+.modal-confirm {
+    border: none;
+    border-radius: .8em;
+    padding: 0;
+    width: min(420px, 92vw);
+    background: #fefae0;
+    box-shadow: 0 8px 40px rgba(0,0,0,.3);
+}
+.modal-confirm::backdrop { background: rgba(0,0,0,.5); backdrop-filter: blur(2px); }
+
+.modal-confirm-corpo {
+    padding: 2em 1.8em 1.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+}
+
+.modal-confirm-msg {
+    margin: 0;
+    color: #333;
+    font-size: .95rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.modal-confirm-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: .75em;
+}
+
+.btn-excluir-confirm {
+    background: #c0392b;
+    border: none;
+    color: #fff;
+    border-radius: 2em;
+    padding: .5em 1.4em;
+    font-family: Puritan, sans-serif;
+    font-size: .9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-excluir-confirm:hover { background: #a93226; }
+.btn-excluir-confirm:disabled { background: #aaa; cursor: not-allowed; }

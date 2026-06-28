@@ -283,7 +283,7 @@ cadastroForm.addEventListener('submit', async (evento) => {
 
     cadastroForm.reset();
     // cadastro (e login automático) concluído: leva o usuário para a home
-    window.location.href = 'home.html';
+    window.location.replace('home.html');
   } catch (error) {
     console.error('Erro ao cadastrar:', error);
     cadastroErro.textContent = 'Erro de conexão com o servidor';
@@ -314,7 +314,7 @@ loginForm.addEventListener('submit', async (evento) => {
 
     loginForm.reset();
     // login concluído: leva o usuário para a home
-    window.location.href = 'home.html';
+    window.location.replace('home.html');
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     loginErro.textContent = 'Erro de conexão com o servidor';
@@ -327,7 +327,7 @@ async function verificarSessaoAtual() {
     const resposta = await fetch('/auth/me', { credentials: 'include' });
 
     if (resposta.ok) {
-      window.location.href = 'home.html';
+      window.location.replace('home.html');
     }
   } catch (error) {
     console.warn('Não foi possível verificar a sessão atual', error);

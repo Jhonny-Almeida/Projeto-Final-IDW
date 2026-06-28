@@ -1,5 +1,5 @@
-const nomeUsuarioLogado = document.getElementById('nomeUsuarioLogado');
 const logoutBtn         = document.getElementById('logoutBtn');
+const btnPerfil         = document.getElementById('btnPerfil');
 const searchForm        = document.getElementById('searchForm');
 const searchInput       = document.getElementById('searchInput');
 const gridTitulo        = document.getElementById('gridTitulo');
@@ -10,18 +10,24 @@ const btnVoltar         = document.getElementById('btnVoltar');
 async function protegerPagina() {
   try {
     const resposta = await fetch('/auth/me', { credentials: 'include' });
-    if (!resposta.ok) { window.location.href = 'index.html'; return; }
+    if (!resposta.ok) {
+      window.location.replace('index.html');
+      return;
+    }
     const dados = await resposta.json();
-    nomeUsuarioLogado.textContent = `Olá, ${dados.usuario.nome}`;
+    if (btnPerfil) btnPerfil.textContent = dados.usuario.nome;
   } catch (e) {
-    window.location.href = 'index.html';
+    // erro de rede — não redireciona para evitar loop; só loga
+    console.error('Erro ao verificar sessão:', e);
   }
 }
+
+btnPerfil.addEventListener('click', () => window.location.replace('user.html'));
 
 logoutBtn.addEventListener('click', async () => {
   try { await fetch('/auth/logout', { method: 'POST', credentials: 'include' }); }
   catch (e) { console.error(e); }
-  finally { window.location.href = 'index.html'; }
+  finally { window.location.replace('index.html'); }
 });
 
 protegerPagina();
@@ -55,12 +61,20 @@ async function buscarLastfm(artista) {
   } catch { return null; }
 }
 
-async function buscarItunes(termo) {
+async function buscarItunes(musica, artista) {
+  // busca pela música específica — evita pegar a mesma capa do artista para todas as faixas
+  const termo = artista ? `${musica} ${artista}` : musica;
   if (!termo) return null;
   try {
-    const r = await fetch(`${ITUNES_SEARCH_URL}?term=${encodeURIComponent(termo)}&media=music&entity=song&attribute=artistTerm&limit=1`);
+    const r = await fetch(`${ITUNES_SEARCH_URL}?term=${encodeURIComponent(termo)}&media=music&entity=song&limit=5`);
     if (!r.ok) return null;
-    const url = (await r.json())?.results?.[0]?.artworkUrl100;
+    const results = (await r.json())?.results || [];
+    // tenta encontrar resultado cujo nome bate com a música
+    const match = results.find(res =>
+      res.trackName?.toLowerCase().includes(musica.toLowerCase()) ||
+      musica.toLowerCase().includes(res.trackName?.toLowerCase())
+    ) || results[0];
+    const url = match?.artworkUrl100;
     return url ? url.replace('100x100bb', '600x600bb') : null;
   } catch { return null; }
 }
@@ -142,8 +156,7 @@ async function carregarMusicasMaisTocadas() {
       if (melhorCapa(faixa.image)) return;
       const pos     = i + 1;
       const artista = faixa.artist?.name || '';
-      buscarLastfm(artista)
-        .then(u => u || buscarItunes(artista))
+      buscarItunes(faixa.name, artista)
         .then(u => {
           if (!u) return;
           const c = grid.querySelector(`.card[data-pos="${pos}"]`);
@@ -193,8 +206,7 @@ async function pesquisarMusicas(termo) {
       // busca capa se for placeholder
       const ehPlaceholder = !melhorCapa(faixa.image);
       if (ehPlaceholder) {
-        buscarLastfm(artista)
-          .then(u => u || buscarItunes(artista))
+        buscarItunes(faixa.name, artista)
           .then(u => {
             if (!u) return;
             const c = grid.querySelector(`.card[data-search="${i}"]`);
