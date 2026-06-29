@@ -1,240 +1,206 @@
-# SoundMark
+# 🎵 SoundMark
 
-Aplicação web para buscar artistas e faixas musicais (via Last.fm), avaliar músicas e gerenciar usuários — com backend em Node.js/Express, banco MySQL e frontend estático servido por Nginx, tudo orquestrado via Docker Compose.
+> Aplicação web para avaliar músicas e artistas, com autenticação de usuários, persistência em MySQL e integração com a API do **Last.fm**. Todo o ambiente é orquestrado via **Docker Compose** (Nginx + Node.js/Express + MySQL).
 
-## Arquitetura
+---
 
+## 📌 Visão Geral
+
+O SoundMark permite que um usuário:
+
+* Crie uma conta e faça login (sessão autenticada)
+* Busque artistas e músicas usando a API do Last.fm
+* Registre avaliações (nota de 1 a 5, comentário e capa do álbum) das músicas que ouviu
+* Liste, edite seus dados e exclua suas próprias avaliações
+
+---
+
+## 🏗️ Arquitetura
+
+```mermaid
+flowchart LR
+    User[Usuário / Browser]
+    Nginx[Nginx :8080]
+    API[API Node.js/Express :3000]
+    MySQL[(MySQL :3306)]
+    LastFM[(Last.fm API)]
+
+    User -->|HTTP| Nginx
+    Nginx -->|/usuarios, /auth, /avaliacoes, /lastfm| API
+    Nginx -->|arquivos estáticos| User
+    API -->|SQL| MySQL
+    API -->|proxy de requisições| LastFM
 ```
-Browser  ──▶  Nginx (porta 8080)  ──▶  App Node/Express (porta 3000)  ──▶  MySQL (porta 3306)
-                  │                          │
-            serve arquivos estáticos    proxy para API do Last.fm
-            (frontend/) e faz proxy     (chave de API fica só no
-            de /auth, /usuarios,         backend, via variável
-            /avaliacoes, /lastfm         de ambiente)
-```
 
-A chave da API do Last.fm **nunca** fica exposta no frontend: todas as chamadas passam por um proxy no backend (`/lastfm/...`), que injeta a chave a partir de uma variável de ambiente.
+A aplicação roda em três containers:
 
-## Estrutura do projeto
+| Container | Papel |
+| --- | --- |
+| `nginx_lab` | Serve o frontend estático e faz proxy reverso das rotas da API |
+| `app_lab` | API Node.js/Express (autenticação, usuários, avaliações, proxy Last.fm) |
+| `mysql_lab` | Banco de dados MySQL 8, com volume persistente |
 
-```
+---
+
+## 📦 Estrutura do Projeto
+
+```text
 soundMark/
-├── app/                        # Backend Node.js / Express
+├── docker-compose.yml
+├── .env                       # LASTFM_API_KEY
+├── db/
+│   └── init.sql               # criação das tabelas usuarios e avaliacoes
+├── nginx/
+│   └── default.conf           # proxy reverso para a API
+├── app/                       # API Node.js
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js              # bootstrap do Express
+│   ├── db.js                  # pool MySQL + migrations automáticas
+│   ├── middlewares/
+│   │   └── auth.js            # exige sessão autenticada
 │   ├── controllers/
 │   │   ├── authController.js
+│   │   ├── usuariosController.js
 │   │   ├── avaliacoesController.js
-│   │   ├── lastfmController.js     # Proxy para a API do Last.fm
-│   │   └── usuariosController.js
-│   ├── middlewares/
-│   │   └── auth.js                 # Middleware de autenticação (exigirLogin)
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── avaliacoes.js
-│   │   ├── lastfm.js
-│   │   └── usuarios.js
+│   │   └── lastfmController.js
 │   ├── services/
-│   │   ├── avaliacoesService.js
-│   │   └── usuariosService.js
-│   ├── db.js                       # Conexão com o MySQL
-│   ├── server.js                   # Bootstrap do Express
-│   ├── package.json
-│   └── Dockerfile
-├── db/
-│   └── init.sql                    # Script de criação/seed do banco
-├── frontend/                       # HTML/CSS/JS estático (servido pelo Nginx)
-│   ├── index.html / app.js
-│   ├── home.html  / home.js
-│   ├── user.html  / user.js
-│   ├── lastfm.js                   # Funções de integração com /lastfm (proxy)
-│   └── style.css
-├── nginx/
-│   └── default.conf                # Proxy reverso para /auth, /usuarios, /avaliacoes, /lastfm
-├── docker-compose.yml
-├── .env.example                    # Modelo de variáveis de ambiente
-└── .gitignore
+│   │   ├── usuariosService.js
+│   │   └── avaliacoesService.js
+│   └── routes/
+│       ├── auth.js
+│       ├── usuarios.js
+│       └── lastfm.js
+└── frontend/                  # HTML/CSS/JS puro
+    ├── index.html / app.js    # cadastro/login
+    ├── home.html / home.js    # busca e avaliação de músicas
+    ├── user.html / user.js    # perfil e avaliações do usuário
+    ├── frontend.lastfm.js     # chamadas à API do Last.fm via proxy
+    └── style.css
 ```
 
-## Pré-requisitos
+---
 
-- [Docker](https://www.docker.com/) e Docker Compose instalados
-- Uma chave de API do [Last.fm](https://www.last.fm/api/account/create) (gratuita)
+## ⚙️ Stack Tecnológica
 
-## Configuração
+| Camada | Tecnologia |
+| --- | --- |
+| Frontend | HTML, CSS e JavaScript puro |
+| Proxy / Servidor estático | Nginx |
+| Backend | Node.js + Express |
+| Sessão | express-session |
+| Hash de senha | bcryptjs |
+| Banco de Dados | MySQL 8 (driver `mysql2`) |
+| API externa | Last.fm |
+| Containers | Docker + Docker Compose |
 
-### 1. Clonar o repositório
+---
+
+## 🚀 Como executar
+
+### 1. Pré-requisitos
+
+* Docker e Docker Compose instalados
+* Uma chave de API do Last.fm ([obter aqui](https://www.last.fm/api/account/create))
+
+### 2. Configurar variáveis de ambiente
+
+Dentro de `soundMark/`, crie/edite o arquivo `.env`:
+
+```env
+LASTFM_API_KEY=sua_chave_aqui
+```
+
+### 3. Subir o ambiente
 
 ```bash
-git clone <url-do-repositorio>
 cd soundMark
+docker-compose up -d --build
 ```
 
-> Se você recebeu o projeto como arquivo `.zip` em vez de repositório Git, apenas extraia o conteúdo e entre na pasta `soundMark` pelo terminal.
+### 4. Acessar a aplicação
 
-### 2. Obter a chave da API do Last.fm
+* Frontend: http://localhost:8080
+* API (sem passar pelo Nginx): http://localhost:3000
 
-1. Acesse [https://www.last.fm/api/account/create](https://www.last.fm/api/account/create) e crie uma conta de desenvolvedor (gratuita).
-2. Preencha o formulário (nome da aplicação pode ser qualquer coisa, ex.: "SoundMark").
-3. Após criar, copie o valor de **API key**.
-
-### 3. Criar o arquivo `.env`
-
-Copie o arquivo de exemplo:
+### 5. Parar o ambiente
 
 ```bash
-cp .env.example .env
+docker-compose down
 ```
 
-Abra o `.env` em um editor de texto e cole sua chave, **sem aspas e sem espaços**:
-
-```
-LASTFM_API_KEY=f5a143c4b5fefd5d6776ce666e553c11
-```
-
-Checklist rápido:
-- [ ] O arquivo se chama exatamente `.env` (não `.env.example`, `env`, ou `.env.txt`)
-- [ ] Está na mesma pasta do `docker-compose.yml` (`soundMark/`)
-- [ ] O valor da chave não tem aspas (`' '` ou `" "`)
-- [ ] Não há espaços antes/depois do `=`
-
-### 4. Verificar portas livres
-
-Por padrão a aplicação usa as portas abaixo na sua máquina. Garanta que nenhuma esteja ocupada por outro serviço:
-
-| Porta | Serviço |
-|-------|---------|
-| 8080  | Nginx (frontend) |
-| 3000  | API Node.js |
-| 3306  | MySQL |
-
-Se alguma estiver em uso, edite o lado esquerdo do mapeamento em `docker-compose.yml`, por exemplo `"8081:80"`.
-
-### 5. Subir os containers
+Para remover também os dados do banco:
 
 ```bash
-docker compose up --build
+docker-compose down -v
 ```
 
-Na primeira execução, o Docker vai:
-- Baixar as imagens (`mysql:8.0`, `nginx:alpine`, `node:18`)
-- Buildar a imagem do backend (`./app`)
-- Criar o banco de dados e rodar `db/init.sql` automaticamente
-- Subir os 3 containers (`mysql_lab`, `app_lab`, `nginx_lab`)
+---
 
-Aguarde até ver o container `app_lab` reportar que está ouvindo na porta 3000 — ele depende do MySQL estar "healthy" antes de iniciar (configurado via `healthcheck` no `docker-compose.yml`), então a primeira subida pode demorar uns 20-30 segundos.
+## 🧠 Banco de Dados
 
-### 6. Acessar a aplicação
+O script `db/init.sql` é executado automaticamente na primeira inicialização do container MySQL e cria as tabelas:
 
-Abra [http://localhost:8080](http://localhost:8080) no navegador.
+* **usuarios** — `id`, `nome` (único), `senha_hash`, `created_at`
+* **avaliacoes** — `id`, `usuario_id` (FK), `musica`, `artista`, `nota` (1–5), `comentario`, `capa_url`, `created_at`
 
-### 7. Conferir se tudo está no ar
+Além disso, o arquivo `app/db.js` executa migrations idempotentes a cada inicialização da API, garantindo que a tabela `avaliacoes` exista com todas as colunas mesmo em volumes antigos.
 
-```bash
-curl http://localhost:8080/health
-```
+| Parâmetro | Valor |
+| --- | --- |
+| Host | mysql |
+| Porta | 3306 |
+| Database | lab_db |
+| Usuário | user |
+| Senha | user123 |
 
-Deve retornar uma resposta de sucesso da API. Se der erro, veja a seção [Solução de problemas](#solução-de-problemas) abaixo.
+---
 
-> ⚠️ O arquivo `.env` **não deve ser commitado** no Git — ele já está listado no `.gitignore`. Nunca suba sua chave de API real para um repositório público.
+## 🌐 Endpoints da API
 
-## Solução de problemas
+### Autenticação (`/auth`)
 
-**`app.js` (ou outro arquivo do frontend) retorna 404 no navegador**
-Confira se os nomes dos arquivos dentro de `frontend/` estão exatamente como o projeto espera (`app.js`, `home.js`, `lastfm.js`, etc. — sem prefixos ou sufixos extras).
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| POST | `/auth/cadastro` | Cria um novo usuário (nome, senha, confirmarSenha) |
+| POST | `/auth/login` | Autentica o usuário e abre sessão |
+| POST | `/auth/logout` | Encerra a sessão |
+| GET | `/auth/me` | Retorna o usuário autenticado na sessão |
 
-**Erro `Cannot find module './routes/lastfm'` ao subir o `app`**
-O arquivo precisa se chamar `routes/lastfm.js`. Renomeie se necessário e rode `docker compose up --build` novamente.
+### Usuários (`/usuarios`) — requer login
 
-**Site carrega muito rápido e nada funciona (botões não respondem)**
-Abra o DevTools do navegador (F12 → Console) e procure erros de JavaScript. Um erro comum é carregar o mesmo arquivo `<script>` duas vezes na mesma página (gera `Identifier already declared` e trava todo o script).
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/usuarios` | Lista todos os usuários |
+| GET | `/usuarios/:id` | Busca um usuário por ID |
+| PUT | `/usuarios/:id` | Atualiza o nome de um usuário |
+| DELETE | `/usuarios/:id` | Remove um usuário |
 
-**Erro 500 ou dados do Last.fm não aparecem**
-Verifique se o `.env` está configurado corretamente e se o container foi reiniciado depois de criá-lo/editá-lo:
+### Avaliações (`/avaliacoes`) — requer login
 
-```bash
-docker compose down
-docker compose up --build
-```
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| POST | `/avaliacoes` | Cria uma avaliação (música, artista, nota, comentário, capa_url) |
+| GET | `/avaliacoes` | Lista as avaliações do usuário logado |
+| DELETE | `/avaliacoes/:id` | Remove uma avaliação do usuário logado |
 
-**Mudei o `.env` mas nada mudou**
-Variáveis de ambiente só são lidas quando o container é (re)criado. Rode `docker compose down` seguido de `docker compose up --build` — apenas reiniciar (`restart`) não é suficiente.
+### Last.fm (`/lastfm`) — proxy para a API externa
 
-**Quero resetar tudo do zero (banco incluso)**
+| Método | Rota | Parâmetros | Descrição |
+| --- | --- | --- | --- |
+| GET | `/lastfm/artist-info` | `artista` | Informações sobre um artista |
+| GET | `/lastfm/top-tracks` | `limite` (opcional) | Ranking de músicas mais populares |
+| GET | `/lastfm/track-search` | `termo`, `limite` (opcional, padrão 18) | Busca músicas por termo |
 
-```bash
-docker compose down -v
-docker compose up --build
-```
+### Health check
 
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/health` | Verifica se a API está no ar |
 
-## Serviços (docker-compose)
+---
 
-| Serviço  | Imagem/Build | Porta host | Descrição                          |
-|----------|--------------|------------|-------------------------------------|
-| `nginx`  | `nginx:alpine` | `8080`   | Serve o frontend e faz proxy reverso |
-| `app`    | `./app`        | `3000`   | API Node/Express                     |
-| `mysql`  | `mysql:8.0`    | `3306`   | Banco de dados                       |
+## 🔐 Autenticação
 
-## Endpoints da API
+A autenticação é feita via **sessão** (`express-session`), armazenada em memória no servidor. Após login ou cadastro, o servidor guarda `{ id, nome }` na sessão e o middleware `exigirLogin` bloqueia rotas protegidas (usuários, avaliações) para quem não estiver autenticado, retornando `401`.
 
-Todas as rotas abaixo passam pelo Nginx (`http://localhost:8080`) ou diretamente pela API (`http://localhost:3000`).
-
-### Autenticação — `/auth`
-| Método | Rota             | Descrição          |
-|--------|------------------|---------------------|
-| POST   | `/auth/cadastro` | Cria um novo usuário |
-| POST   | `/auth/login`    | Autentica o usuário  |
-| POST   | `/auth/logout`   | Encerra a sessão     |
-| GET    | `/auth/me`       | Dados do usuário logado |
-
-### Usuários — `/usuarios` (requer login)
-| Método | Rota             | Descrição               |
-|--------|------------------|--------------------------|
-| GET    | `/usuarios`      | Lista usuários           |
-| GET    | `/usuarios/:id`  | Busca usuário por ID     |
-| PUT    | `/usuarios/:id`  | Atualiza usuário         |
-| DELETE | `/usuarios/:id`  | Remove usuário           |
-
-### Avaliações — `/avaliacoes` (requer login)
-| Método | Rota                | Descrição                         |
-|--------|---------------------|-------------------------------------|
-| POST   | `/avaliacoes`       | Cria uma avaliação                  |
-| GET    | `/avaliacoes`       | Lista as avaliações do usuário logado |
-| DELETE | `/avaliacoes/:id`   | Remove uma avaliação                |
-
-### Last.fm (proxy) — `/lastfm`
-| Método | Rota                    | Parâmetros            | Descrição                              |
-|--------|-------------------------|------------------------|------------------------------------------|
-| GET    | `/lastfm/artist-info`   | `artista`              | Informações de um artista                |
-| GET    | `/lastfm/top-tracks`    | `limite` (opcional)    | Faixas mais ouvidas no momento           |
-| GET    | `/lastfm/track-search`  | `termo`, `limite`      | Busca faixas pelo nome                   |
-
-### Saúde do servidor
-| Método | Rota      | Descrição               |
-|--------|-----------|--------------------------|
-| GET    | `/health` | Verifica se a API está no ar |
-
-## Banco de dados
-
-O schema inicial e os dados de seed ficam em `db/init.sql`, executado automaticamente na primeira inicialização do container MySQL (via `docker-entrypoint-initdb.d`).
-
-## Segurança
-
-- A chave da API do Last.fm é lida via variável de ambiente (`LASTFM_API_KEY`) apenas no backend — nunca fica exposta no código do frontend nem no navegador.
-- Rotas de usuários e avaliações exigem sessão autenticada (middleware `exigirLogin`).
-- Senhas de usuário são armazenadas com hash (`bcryptjs`).
-
-## Comandos úteis
-
-```bash
-# Subir os containers em background
-docker compose up -d --build
-
-# Ver logs do backend
-docker compose logs -f app
-
-# Parar e remover os containers
-docker compose down
-
-# Parar e remover containers + volumes (reseta o banco)
-docker compose down -v
-```
