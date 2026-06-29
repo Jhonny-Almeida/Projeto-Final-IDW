@@ -100,40 +100,95 @@ soundMark/
 
 ### 1. Pré-requisitos
 
-* Docker e Docker Compose instalados
+* [Git](https://git-scm.com/downloads) instalado
+* [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados
+  * Verifique com: `docker --version` e `docker compose version`
 * Uma chave de API do Last.fm ([obter aqui](https://www.last.fm/api/account/create))
+* Portas `8080` (frontend) e `3306` (MySQL) livres na sua máquina
 
-### 2. Configurar variáveis de ambiente
+### 2. Clonar o repositório
 
-Dentro de `soundMark/`, crie/edite o arquivo `.env`:
-
-```env
-LASTFM_API_KEY=sua_chave_aqui
+```bash
+git clone https://github.com/<seu-usuario>/aula23.04.git
+cd aula23.04
 ```
 
-### 3. Subir o ambiente
+> Troque a URL acima pela URL real do repositório (HTTPS ou SSH). Se você baixou o projeto como `.zip`, basta extrair o arquivo e entrar na pasta extraída.
+
+### 3. Configurar variáveis de ambiente
+
+Entre na pasta do projeto e crie/edite o arquivo `.env`:
 
 ```bash
 cd soundMark
-docker-compose up -d --build
 ```
 
-### 4. Acessar a aplicação
+```env
+# soundMark/.env
+LASTFM_API_KEY=sua_chave_aqui
+```
+
+> Se o repositório tiver um `.env.example`, copie-o com `cp .env.example .env` e depois edite com sua chave.
+
+### 4. Subir o ambiente com Docker
+
+```bash
+docker compose up -d --build
+```
+
+> Use `docker-compose` (com hífen) caso esteja usando uma versão mais antiga do Docker.
+
+Esse comando vai:
+1. Construir a imagem da API Node.js (`app/Dockerfile`);
+2. Baixar e iniciar o container do MySQL, executando `db/init.sql` na primeira inicialização;
+3. Iniciar o Nginx, servindo o frontend e fazendo proxy para a API.
+
+### 5. Verificar se tudo subiu corretamente
+
+```bash
+docker compose ps
+```
+
+Você deve ver três containers com status `Up`: `nginx_lab`, `app_lab` e `mysql_lab`.
+
+Para checar se a API está respondendo:
+
+```bash
+curl http://localhost:3000/health
+```
+
+Para acompanhar os logs em tempo real (útil para depurar problemas):
+
+```bash
+docker compose logs -f app
+```
+
+### 6. Acessar a aplicação
 
 * Frontend: http://localhost:8080
 * API (sem passar pelo Nginx): http://localhost:3000
 
-### 5. Parar o ambiente
+### 7. Parar o ambiente
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
-Para remover também os dados do banco:
+Para parar **e** remover também os dados do banco (reinício "limpo"):
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
+
+### 8. Reiniciar após alterações no código
+
+Se você alterar arquivos da API (`app/`), é necessário reconstruir a imagem:
+
+```bash
+docker compose up -d --build app
+```
+
+Alterações no `frontend/` não exigem rebuild — basta atualizar a página no navegador.
 
 ---
 
@@ -204,3 +259,14 @@ Além disso, o arquivo `app/db.js` executa migrations idempotentes a cada inicia
 
 A autenticação é feita via **sessão** (`express-session`), armazenada em memória no servidor. Após login ou cadastro, o servidor guarda `{ id, nome }` na sessão e o middleware `exigirLogin` bloqueia rotas protegidas (usuários, avaliações) para quem não estiver autenticado, retornando `401`.
 
+---
+
+## 🛠️ Troubleshooting (problemas comuns)
+
+| Problema | Possível causa / solução |
+| --- | --- |
+| `port is already allocated` | Outra aplicação já está usando a porta 8080 ou 3306. Pare o serviço conflitante ou altere a porta mapeada no `docker-compose.yml` |
+| API retorna erro de conexão com o banco | O MySQL pode ainda estar inicializando. Aguarde alguns segundos e veja os logs: `docker compose logs -f mysql` |
+| Busca de música não retorna resultados | Verifique se `LASTFM_API_KEY` está definida corretamente no `.env` e se o container `app` foi reconstruído após a alteração |
+| Alterações no código não aparecem | Rode `docker compose up -d --build app` para reconstruir a imagem da API |
+| Quero recomeçar do zero | `docker compose down -v` remove containers e o volume do banco; depois suba novamente com `docker compose up -d --build` |
